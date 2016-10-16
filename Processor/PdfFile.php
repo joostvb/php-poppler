@@ -74,6 +74,28 @@ class PdfFile
 
     /**
      * @param string $inputfile
+     * @param string $toEncoding
+     *
+     * @throws FileNotFoundException
+     * @return string
+     */
+    public function toTextWithLayout($inputfile, $toEncoding = 'UTF-8')
+    {
+        if (!file_exists($inputfile)) {
+            throw new FileNotFoundException("File $inputfile not found.");
+        }
+
+        $output = $this->pdftotext->command(array('-nopgbrk', '-layout', $inputfile, '-'));
+        $fromEncoding = mb_detect_encoding($output);
+        if ($fromEncoding) {
+            return mb_convert_encoding($output, $toEncoding, $fromEncoding);
+        }
+
+        return mb_convert_encoding($output, $toEncoding);
+    }
+
+    /**
+     * @param string $inputfile
      * @param string $outputfile
      *
      * @throws FileNotFoundException
